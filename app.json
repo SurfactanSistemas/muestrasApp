@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Prueba Surfac",
+    "version": "0.2.0",
+    "slug": "prueba-surfac",
+    "sdkVersion": "27.0.0",
+    "ios": {
+      "bundleIdentifier": "com.ferreyra.surfacmuestras"
+    },
+    "android": {
+      "package": "com.ferreyra.surfacmuestras"
+    }
+  }
+}
