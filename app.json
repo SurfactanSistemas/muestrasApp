@@ -1,13 +1,9 @@
 {
   "expo": {
     "name": "Prueba Surfac",
-    "version": "0.2.0",
+    "version": "0.1.0",
     "slug": "prueba-surfac",
     "sdkVersion": "27.0.0",
-    "splash": {
-      "image": "./assets/img/surfaclogo.png",
-      "backgroundColor": "#133c74"
-    },
     "ios": {
       "bundleIdentifier": "com.ferreyra.surfacmuestras"
     },

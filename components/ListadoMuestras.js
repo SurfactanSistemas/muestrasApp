@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, Image, View, FlatList} from 'react-native';
+import {StyleSheet, Text, Image, View, FlatList, Button} from 'react-native';
 import { createStackNavigator} from 'react-navigation';
 import ItemListado from './ItemListado.js'
 import Header from './Header.js';
@@ -15,10 +15,12 @@ export default class ListadoMuestras extends React.Component{
         datos: [],
         refrescando : false,
         ultimo: 0,
-        urlConsulta: ''
+        urlConsulta: '',
+        idVendedor: this.props.navigation.getParam('idVendedor', -1)
     }
 
     componentDidMount(){
+        //this.setState({idVendedor: this.props.navigation.getParam('idVendedor', -1)});
         return this._ReGenerarItems();
     }
 
@@ -26,11 +28,14 @@ export default class ListadoMuestras extends React.Component{
         return fetch('https://raw.githubusercontent.com/fergthh/surfac/master/muestrasDBURL.json')
                     .then((response) => response.json())
                     .then((responseJson) => {
-                        this.setState({urlConsulta: responseJson[0].url + '/todas'});
+                        this.setState({urlConsulta: responseJson[0].url + '/todas/' + this.state.idVendedor});
                     })
     }
 
     _ReGenerarItems(){
+
+        if (this.state.idVendedor == -1) return;
+
         this.setState({refrescando: true});
         return this.ConsultarUrlConsulta()
                     .then(() => {
