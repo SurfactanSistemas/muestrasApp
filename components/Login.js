@@ -1,7 +1,8 @@
 import React from 'react';
-import {StyleSheet, Text, View, TextInput, ScrollView, Button, Image, Dimensions} from 'react-native';
+import {StyleSheet, View, TextInput, ScrollView, Image, Dimensions} from 'react-native';
 import { createStackNavigator} from 'react-navigation';
 import Config from '../config/config.js';
+import { Container, Text, Header, Content, Form, Item, Input, Label, Icon, Button, Spinner } from 'native-base';
 
 export default class DetallesPedido extends React.Component{
     
@@ -20,7 +21,8 @@ export default class DetallesPedido extends React.Component{
             passVendedor: '',
             showError: false,
             msgError: '',
-            tamanioWidth: 0//Dimensions.get('window').width
+            tamanioWidth: 0, //Dimensions.get('window').width,
+            fontLoaded: true
         };
     }
 
@@ -30,23 +32,32 @@ export default class DetallesPedido extends React.Component{
         this.setState({tamanioWidth: value - 50});
     }
 
-    componentWillMount(){
+    async componentWillMount(){
+        await Expo.Font.loadAsync({
+            'Roboto': require('native-base/Fonts/Roboto.ttf'),
+            'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
+            'Ionicons': require('@expo/vector-icons/fonts/Ionicons.ttf'),
+        });
+
+        this.setState({fontLoaded: false});
+
         let {width, height} = Dimensions.get('window');
         this.handleChangeDimensions({width: width, height: height});
     }
-
-    handleOnFocus = () => {this.setState({margenInput: 350})};
 
     handleOnChangeText = (text) => {
         this.setState({passVendedor: text, msgError: ''})};
 
     handleOnPress = async () => {
         this.setState({showError: false, msgError: ''});
-        Config.Consultar('/login/' + this.state.passVendedor, (resp) => {
-            resp.then((res) => res.json())
-                .then((res) => {
-                    if (res != -1){
-                        this.props.navigation.navigate('Listado', {idVendedor: res});
+        Config.Consultar('login/' + this.state.passVendedor, (resp) => {
+            resp.then(res => res.json())
+                .then((resJson) => {
+                    if (resJson.length == 0) throw 'La clave indicada no es una cláve válida. Vuela a intentar.';
+                    let _idVendedor = resJson[0].Table[0].Vendedor;
+
+                    if (_idVendedor > 0){
+                        this.props.navigation.navigate('Listado', {idVendedor: _idVendedor});
                     }else{ this.setState({showError: true, msgError: 'La clave indicada no es una cláve válida. Vuela a intentar.'}); }
                 })
                 .catch((err) => {
@@ -56,60 +67,68 @@ export default class DetallesPedido extends React.Component{
     };
 
     render(){
-        
+        if (this.state.fontLoaded){
+            return ( <Spinner /> )
+        }
         return (
-            <ScrollView contentContainerStyle= {{flexGrow: 1}} style={styles.container}>
-                <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+            <Container>
+                <Content contentContainerStyle= {{flexGrow: 1}} style={styles.container}>
+                    <View style={{ alignItems: 'center', justifyContent: 'center'}}> 
+                        <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginVertical: 50}}>
+                            <Image source = {require('../assets/img/surfaclogo.png')} />
+                            <Text style={{color: '#fff', fontSize: 25}}>SURFACTAN S.A</Text>
+                        </View>
                     
-                    <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginVertical: 50}}>
-                        <Image source = {require('../assets/img/surfaclogo.png')} />
-                        <Text style={{color: '#fff', fontSize: 25}}>SURFACTAN S.A</Text>
+                        <View style = {{margin: 20}}>
+                            <Text style={[styles.titleHeader]}>Inicio de Sesión</Text>
+                        </View>
                     </View>
-                    
-                    <View style = {{margin: 20}}>
-                        <Text style={[styles.titleHeader]}>Inicio de Sesión</Text>
+                        
+                    <Form style={styles.loginFormContainer}>
+                        <Item floatingLabel last>
+                            <Icon active name='key' style={styles.loginFormIconInput}/>
+                            <Label style={{color: '#fff', marginLeft: 5}}>Contraseña...</Label>
+                            <Input secureTextEntry={true} style={[styles.InputText, {width: this.state.tamanioWidth}]}
+                                onChangeText={this.handleOnChangeText}
+                            />
+                        </Item>
+                        <Button block style={{ marginTop: 15}} onPress={this.handleOnPress}>
+                            <Text>Iniciar Sesión</Text>
+                        </Button>
+                    </Form>
+                    <View>
+                        <Text style={{color: 'yellow', fontSize: 15, textAlign: 'center'}}>{this.state.msgError}</Text>
                     </View>
-                    
-                    <View style={[styles.loginFormContainer]}>
-                        <TextInput placeholder = 'Contraseña...' secureTextEntry={true} underlineColorAndroid = 'transparent' style={[styles.InputText, {width: this.state.tamanioWidth}]} onChangeText = {this.handleOnChangeText} />
-                    </View>
-                    
-                    <View style = {{width: this.state.tamanioWidth}}>
-                        <Button style={[styles.ButtonForm]} title = 'Iniciar Sesión ' onPress = {this.handleOnPress} />
-                    </View>
-
-                    <View style = {{width: this.state.tamanioWidth}}>
-                        <Text style= {{color: 'yellow', fontSize: 15, fontWeight: 'bold', textAlign: 'center'}}>{this.state.msgError}</Text>
-                    </View>
-
-                </View>
-            </ScrollView>
+                </Content>
+            </Container>
         );
     }
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Config.bgColor
+        backgroundColor: Config.bgColor,
+        paddingLeft: 30,
+        paddingRight: 30
     },
     titleHeader: {
         color: '#fff',
-        // fontWeight: 'bold',
         fontSize: 20
     },
     InputText: {
         color: '#ccc',
-        backgroundColor: '#fff',
         padding: 10,
-        marginBottom: 20,
-        minWidth: 250,
-        textAlign: 'center'
+        marginBottom: 2,
     },
     ButtonForm: {
         margin: 20
     },
     loginFormContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        paddingLeft: 30,
+        paddingRight: 30
+    },
+    loginFormIconInput: {
+        color: '#fff',
+        marginRight: 5
     }
 });
