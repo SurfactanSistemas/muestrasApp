@@ -4,153 +4,180 @@ import { createStackNavigator} from 'react-navigation';
 import ItemListado from './ItemListado.js'
 import Header from './Header.js';
 import HeaderNav from './HeaderNav.js';
+import { Container, Content, List, Badge } from 'native-base';
+import {Col, Row, Grid} from 'react-native-easy-grid';
+import Config from '../config/config';
+import config from '../config/config';
 
 export default class DetallesPedido extends React.Component{
-    
-    static navigationOptions = {
-        headerTitle: <HeaderNav />,
-    };
+	
+	static navigationOptions = {
+		headerTitle: <HeaderNav />,
+	};
 
-    
-        //headerRight: <Button title="Info" color="#fff" />
+	state = {
+		datos: this.props.navigation.getParam('Cliente', undefined),
+		refrescando : false,
+		ultimo: 0,
+		urlConsulta: ''
+	}
 
-    state = {
-        datos: [],
-        refrescando : false,
-        ultimo: 0,
-        urlConsulta: ''
-    }
+	_KeyExtractor = (item, index) => index + '';
 
-    componentDidMount(){
-        return this._ReGenerarItems();
-    }
+	Row(texto, contenido, _fontSize = 20){
+		return (
+			<View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}>
+				<Text style={{fontSize: _fontSize, flex: 1, backgroundColor: '#133c74', color: 'white', paddingLeft: 10, paddingVertical: 5 + Math.ceil((20 - _fontSize)/2)}}>{texto} </Text><Text style={{textAlign: 'left', paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#eee', fontSize: 20, flex: 3, fontStyle: 'italic'}}>{contenido}</Text>
+			</View>
+		);
+	}
 
-    ConsultarUrlConsulta() {
-        return fetch('https://raw.githubusercontent.com/fergthh/surfac/master/muestrasDBURL.json')
-                    .then((response) => response.json())
-                    .then((responseJson) => {
-                        this.setState({urlConsulta: responseJson[0].url + '/detalle/' + this.props.navigation.getParam('Pedido', '0')});
-                    })
-    }
+	render(){
+		if (this.state.datos){
+			let Cliente = this.state.datos;
+			
+			return (
+				<Container>
+					<Content contentContainerStyle={{flex: 1, backgroundColor: '#fff'}}>
+						<Grid>
+							<Row size={1}>
+								<Col style={{backgroundColor: Config.bgColorSecundario}}>
+									<Row style={{alignItems: 'center', justifyContent: 'center'}}>
+										<Text style={{fontWeight: 'bold', color: '#fff', fontSize: 25}}>{Cliente.Razon}</Text>
+									</Row>
+									<Row style={{alignItems: 'center', justifyContent: 'center'}}>
+										<Text style={{fontStyle: 'italic', color: '#fff', fontSize: 15}}>{Cliente.Datos[0].Datos[0].DesVendedor}</Text>
+									</Row>
+								</Col>
+							</Row>
+							<Row size={6}>
+								<Col>
+									<List
+										dataArray={Cliente.Datos}
+										renderRow={(Pedido) => {
+											let Productos = [];
+											Pedido.Datos.map((dato) => Productos.push({Codigo: dato.Producto, Descripcion: dato.DesProducto , Cantidad: Config.NormalizarNumero(dato.Cantidad)}) );
+											let Fecha = Pedido.Datos[0].Fecha
+											return (
+												<Col>
+													
+														
+														{/* Encabezado */}
+														<Row size={1} style={{backgroundColor: Config.bgColorTerciario, height: 60, marginTop: 20,  borderTopColor: '#eee', borderTopWidth: 2, borderBottomColor: '#eee', borderBottomWidth: 2}}>
+															<Col size={1} style={{justifyContent: 'center', alignItems: 'center'}}>
+																<Text style={{color: '#fff', fontSize: 15, fontWeight: 'bold'}}> Nro. Pedido:</Text>
+															</Col>
+															<Col size={2} style={{justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff'}}>
+																<Text>{Pedido.Pedido}</Text>
+															</Col>
+														</Row>
+														<Row size={1} style={{backgroundColor: Config.bgColorTerciario, height: 40, borderBottomColor: '#eee', borderBottomWidth: 2}}>
+															<Col size={2} style={{justifyContent: 'center', alignItems: 'center'}}>
+																<Text style={{color: '#fff', fontSize: 15, fontWeight: 'bold'}}>Estado:</Text>
+															</Col>
+															<Col size={1} style={{justifyContent: 'center', alignItems: 'center', backgroundColor: 'green'}}>
+																<Text style={{color: '#fff', paddingHorizontal: 5}}>Enviado</Text>
+															</Col>
+															<Col size={1} style={{justifyContent: 'center', alignItems: 'center'}}>
+																<Text style={{color: '#fff', fontSize: 15, fontWeight: 'bold'}}>Fecha:</Text>
+															</Col>
+															<Col size={2} style={{justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff'}}>
+																<Text>{Fecha}</Text>
+															</Col>
+														</Row>
+														
+														<Row size={1} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center', borderBottomColor: '#eee', borderBottomWidth: 2}}>
+															<Text style={{color: '#fff', fontWeight: 'bold', fontSize: 15, fontStyle: 'italic', marginVertical: 10}}>
+																Items
+															</Text>
+														</Row>
+														<Row size={2}>
+															{/* Listado de Items */}
+															<Col>
+																<Row style={{backgroundColor: Config.bgColorTerciario, paddingVertical: 10}}>
+																	<Col size={1} style={{justifyContent: 'center', alignItems: 'center'}}>
+																		<Text style={{fontSize: 15, color: '#fff', fontWeight: 'bold'}}>Codigo</Text>
+																	</Col>
+																	<Col size={3} style={{justifyContent: 'center', alignItems: 'center'}}>
+																		<Text style={{fontSize: 15, color: '#fff', fontWeight: 'bold'}}>Descripción</Text>
+																	</Col>
+																	<Col size={1} style={{justifyContent: 'center', alignItems: 'center'}}>
+																		<Text style={{fontSize: 15, color: '#fff', fontWeight: 'bold'}}>Cantidad (Kgs)</Text>
+																	</Col>
+																</Row>
+																{Productos.map((producto) => {
+																	return (
+																		<Row key={producto.Codigo} style={{backgroundColor: '#eee', padding: 10, borderBottomColor: '#aaa', borderBottomWidth: 1}}>
+																			<Col size={1}>
+																				<Text style={{fontSize: 12}}>({producto.Codigo})</Text>
+																			</Col>
+																			<Col size={3} style={{paddingLeft: 10}}>
+																				<Text>{producto.Descripcion}</Text>
+																			</Col>
+																			<Col size={1}>
+																				<Text style={{textAlign: 'right', paddingRight: 5}}>{producto.Cantidad}</Text>
+																			</Col>
+																		</Row>
+																	)
+																})}
+																<Row style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginTop: 20, marginHorizontal: 60 }}></Row>
+															</Col>
+														</Row>
 
-    _ReGenerarItems(){
-        this.setState({refrescando: true});
-        return this.ConsultarUrlConsulta()
-                    .then(() => {
-                        return fetch(this.state.urlConsulta)
-                                .then((response) => response.json())
-                                .then((responseJson) => {
-                                    this.setState({
-                                        refrescando: false,
-                                        datos: responseJson
-                                    });
-                                })
-                                .catch((error) => console.error(error));
-                    })
-                    .catch((error) => console.error(error));
-        this.setState({datos, refrescando: false});        
-    }
+												</Col>
+											)
+										}}
+									>
 
-    _KeyExtractor = (item, index) => index + '';
-
-    Row(texto, contenido, _fontSize = 20){
-        return (
-            <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}>
-                <Text style={{fontSize: _fontSize, flex: 1, backgroundColor: '#133c74', color: 'white', paddingLeft: 10, paddingVertical: 5 + Math.ceil((20 - _fontSize)/2)}}>{texto} </Text><Text style={{textAlign: 'left', paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#eee', fontSize: 20, flex: 3, fontStyle: 'italic'}}>{contenido}</Text>
-            </View>
-        );
-    }
-
-    render(){
-        if (!this.state.refrescando && this.state.datos.length > 0){
-            return (
-                <ScrollView>
-                    <View style = {styles.container}>
-                        {this.Row('Cliente:', this.state.datos[0].Razon)}
-                        {this.Row('Cod Cliente:', this.state.datos[0].Cliente, 15)}
-                        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5, backgroundColor: '#eee'}}>
-                            <Text style={{flex: 1, backgroundColor: '#133c74', color: 'white', paddingLeft: 10, paddingVertical: 5}}>
-                                Pedido
-                            </Text>
-                            <Text style={{flex: 2, paddingLeft: 10, fontStyle: 'italic'}}>
-                                {this.state.datos[0].Pedido}
-                            </Text>
-                            <Text  style={{flex: 1, backgroundColor: '#133c74', color: 'white', paddingLeft: 10, paddingVertical: 5}}>
-                                Muestra
-                            </Text>
-                            <Text  style={{flex: 2, paddingLeft: 10, fontStyle: 'italic'}}>
-                                {this.state.datos[0].Muestra}
-                            </Text>
-                        </View>
-                        
-                        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5, backgroundColor: '#eee'}}>
-                            <Text style={{flex: 1, backgroundColor: '#133c74', color: 'white', paddingLeft: 10, paddingVertical: 5}}>
-                                Fecha Pedido
-                            </Text>
-                            <Text style={{flex: 3, paddingLeft: 10, fontStyle: 'italic'}}>
-                                {this.state.datos[0].Fecha}
-                            </Text>
-                        </View>
-
-                        <View style={{backgroundColor: '#133c74', alignItems: 'center'}}>
-                            <Text style={{color: 'white', margin: 5, fontSize: 15}}>
-                                Dirección de Entrega
-                            </Text>
-                        </View>
-
-                        <View style={{marginBottom: 10, backgroundColor: '#eee', alignItems: 'center'}}>
-                            <Text style={{fontStyle: 'italic', margin: 20}} onPress = {() => Linking.openURL("https://www.google.com.ar/maps/search/" + this.state.datos[0].DireccionEntrega.replace(' ', '+') + '/' ).catch(err => console.error(err)) }>
-                                {this.state.datos[0].DireccionEntrega}
-                            </Text>
-                        </View>
-
-                        <View style={{backgroundColor: '#133c74', alignItems: 'center'}}>
-                            <Text style={{color: 'white', margin: 5, fontSize: 15}}>
-                                Items
-                            </Text>
-                        </View>
-                        <View style={{borderColor: '#ddd', borderStyle: 'solid', borderWidth: 2}}>
-                            {
-                                this.state.datos[0].Productos.map(item =>{
-                                return (
-                                        <View key = {item.Producto} style={{alignItems: 'center', flexDirection: 'row', margin: 10}}>
-                                            <Text style={{flex: 2, fontSize: 13}}>{item.Producto}</Text>
-                                            <Text style={{flex: 4}}>{item.DesProducto}</Text>
-                                            <Text style={{flex: 1, textAlign: 'right', fontSize: 12}}>{parseFloat(item.Cantidad).toFixed(2)} Kgs</Text>
-                                        </View>
-                                    )
-                            })}
-                        </View>
-                        
-                        <View style={{backgroundColor: '#133c74', alignItems: 'center', marginTop: 10}}>
-                            <Text style={{color: 'white', margin: 5, fontSize: 15}}>
-                                Observaciones
-                            </Text>
-                        </View>
-                        <View style={{ backgroundColor: '#eee', alignItems: 'center'}}>
-                            <Text style={{fontStyle: 'italic', margin: 20}}>
-                                {this.state.datos[0].Observaciones}
-                            </Text>
-                        </View>
-
-                        {this.Row('Vendedor', this.state.datos[0].DesVendedor)}
-
-                    </View>
-                </ScrollView>
-            )
-        }else{
-            return (
-                <View style = {styles.container}>
-                    
-                </View>
-            )
-        }
-    }
+									</List>
+								</Col>
+							</Row>
+						</Grid>
+					</Content>
+				</Container>
+			)
+		}
+	}
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#fff',
-        padding: 20,
-    }
+	container: {
+		backgroundColor: '#fff',
+		padding: 20,
+	},
+	TituloSeccion: {
+		color: '#fff',
+		backgroundColor: Config.bgColorSecundario,
+		padding: 15,
+	},
+	EncabezadoPedido: {
+		flexDirection: 'row',
+	},
+	EncabezadoNumeroPedido: {
+		flexDirection: 'row',
+		fontSize: 15,
+		fontWeight: 'bold',
+		backgroundColor: 'red',
+		padding: 15
+	},
+	EstadoContainer: {
+		backgroundColor: 'yellow',
+		padding: 15,
+	},
+	EstadoPedido: {
+		fontSize: 15,
+		color: '#fff',
+		fontWeight: 'bold',
+		fontStyle: 'italic',
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: 0,
+		paddingTop: 5,
+		paddingBottom: 5,
+
+	},
+	FechaPedido: {
+		justifyContent: 'flex-end',
+		backgroundColor: 'gray'
+	}
 });
