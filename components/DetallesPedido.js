@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, Image, View, Linking, ScrollView} from 'react-native';
+import {StyleSheet, Text, Image, View, Linking, ScrollView, TouchableHighlight} from 'react-native';
 import { createStackNavigator} from 'react-navigation';
 import ItemListado from './ItemListado.js'
 import Header from './Header.js';
@@ -107,17 +107,19 @@ export default class DetallesPedido extends React.Component{
 																</Row>
 																{Productos.map((producto) => {
 																	return (
-																		<Row key={producto.Codigo} style={{backgroundColor: '#eee', padding: 10, borderBottomColor: '#aaa', borderBottomWidth: 1}}>
-																			<Col size={1}>
-																				<Text style={{fontSize: 12}}>({producto.Codigo})</Text>
-																			</Col>
-																			<Col size={3} style={{paddingLeft: 10}}>
-																				<Text>{producto.Descripcion}</Text>
-																			</Col>
-																			<Col size={1}>
-																				<Text style={{textAlign: 'right', paddingRight: 5}}>{producto.Cantidad}</Text>
-																			</Col>
-																		</Row>
+																		<TouchableHighlight  key={producto.Codigo} onPress={() => {this.props.navigation.navigate('Observaciones', {Pedido: Pedido.Pedido, Producto: producto.Codigo})}}>
+																			<Row key={producto.Codigo} style={{backgroundColor: '#eee', padding: 10, borderBottomColor: '#aaa', borderBottomWidth: 1}}>
+																				<Col size={1} style={{minWidth: 30}}>
+																					<Text style={{fontSize: 12}}>({producto.Codigo})</Text>
+																				</Col>
+																				<Col size={3} style={{paddingLeft: 10}}>
+																					<Text>{producto.Descripcion}</Text>
+																				</Col>
+																				<Col size={1}>
+																					<Text style={{textAlign: 'right', paddingRight: 5}}>{producto.Cantidad}</Text>
+																				</Col>
+																			</Row>
+																		</TouchableHighlight>
 																	)
 																})}
 																<Row style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginTop: 20, marginHorizontal: 60 }}></Row>

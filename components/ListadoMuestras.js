@@ -113,7 +113,7 @@ export default class ListadoMuestras extends React.Component{
     _KeyExtractor = (item, index) => item.Pedido + '';
 
     _handlePickAnio(val){
-        this.setState({AnioConsulta: val}, this._ReGenerarItems);
+        this.setState({AnioConsulta: val, textFilter: '', primeraVez: true}, this._ReGenerarItems);
     }
 
     _handleChangeTextFiltro(val){
@@ -158,7 +158,7 @@ export default class ListadoMuestras extends React.Component{
                         <Icon name="ios-search" />
                         <Input placeholder="Search" onChangeText={(val) => {this._handleChangeTextFiltro(val)}} value={this.state.textFilter}/>
                     </Item>
-                    <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', paddingLeft: 20}}>
+                    <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', paddingLeft: 20, minWidth: 80}}>
                         <Text style={{color: '#fff'}}>Periodo:</Text>
                         <Picker
                         iosHeader="Select one"
@@ -203,7 +203,7 @@ export default class ListadoMuestras extends React.Component{
                                                         
                                                         <Text style={{fontSize: 10, fontStyle: 'italic'}}>
 
-                                                            {itemCliente.Datos.length} Pedido(2)
+                                                            {itemCliente.Datos.length} Pedido(s)
 
                                                         </Text>
                                                     </View>
