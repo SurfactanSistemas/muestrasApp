@@ -3,6 +3,7 @@ const bgColorSecundario = '#15427F';
 const bgColorTerciario = '#1a55a7';
 
 const BASE_URL = "http://pruebas-surfac.somee.com/api/";
+const BASE_URL_DEBUG = "http://localhost:49865/api/";
 
 const NormalizarNumero = (num) => {
     num = num.substring(0, 1) == '.' ? '0' + num : num;
@@ -29,5 +30,7 @@ export default {
     bgColorTerciario,
     ConsultarUrlConsulta,
     Consultar,
-    NormalizarNumero
+    NormalizarNumero,
+    BASE_URL,
+    BASE_URL_DEBUG
 };

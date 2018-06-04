@@ -102,6 +102,7 @@ export default class DetallesPedido extends React.Component{
                             <Label style={{color: '#fff', marginLeft: 5}}>Contraseña...</Label>
                             <Input getRef={i => this.txtInput = i} secureTextEntry={true} style={[styles.InputText, {width: this.state.tamanioWidth}]}
                                 onChangeText={this.handleOnChangeText}
+                                onSubmitEditing={this.handleOnPress}
                             />
                         </Item>
                         <Button block style={{ marginTop: 15}} onPress={this.handleOnPress}>

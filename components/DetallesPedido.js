@@ -106,8 +106,14 @@ export default class DetallesPedido extends React.Component{
 																	</Col>
 																</Row>
 																{Productos.map((producto) => {
+																	const DatosClienteObservaciones = {
+																		Pedido: Pedido.Pedido,
+																		Producto: producto.Codigo,
+																		Cliente: Cliente.Razon
+																	};
+
 																	return (
-																		<TouchableHighlight  key={producto.Codigo} onPress={() => {this.props.navigation.navigate('Observaciones', {Pedido: Pedido.Pedido, Producto: producto.Codigo})}}>
+																		<TouchableHighlight  key={producto.Codigo} onPress={() => {this.props.navigation.navigate('Observaciones', DatosClienteObservaciones)}}>
 																			<Row key={producto.Codigo} style={{backgroundColor: '#eee', padding: 10, borderBottomColor: '#aaa', borderBottomWidth: 1}}>
 																				<Col size={1} style={{minWidth: 30}}>
 																					<Text style={{fontSize: 12}}>({producto.Codigo})</Text>
