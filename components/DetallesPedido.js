@@ -32,6 +32,14 @@ export default class DetallesPedido extends React.Component{
 		);
 	}
 
+	RenderEstado(WRemito) {
+		return (
+			<Col size={1} style={{justifyContent: 'center', alignItems: 'center', backgroundColor: (WRemito.trim() != 0 ? 'green' : 'red')}}>
+				<Text style={{color: '#fff', paddingHorizontal: 5}}>{(WRemito.trim() != 0 ? 'Enviado' : 'No Enviado')}</Text>
+			</Col>
+		);
+	}
+
 	render(){
 		if (this.state.datos){
 			let Cliente = this.state.datos;
@@ -57,7 +65,8 @@ export default class DetallesPedido extends React.Component{
 										renderRow={(Pedido) => {
 											let Productos = [];
 											Pedido.Datos.map((dato) => Productos.push({Codigo: dato.Producto, Descripcion: dato.DesProducto , Cantidad: Config.NormalizarNumero(dato.Cantidad)}) );
-											let Fecha = Pedido.Datos[0].Fecha
+											let Fecha = Pedido.Datos[0].Fecha;
+											let Remito = Pedido.Datos[0].Remito;
 											return (
 												<Col>
 													
@@ -75,9 +84,7 @@ export default class DetallesPedido extends React.Component{
 															<Col size={2} style={{justifyContent: 'center', alignItems: 'center'}}>
 																<Text style={{color: '#fff', fontSize: 15, fontWeight: 'bold'}}>Estado:</Text>
 															</Col>
-															<Col size={1} style={{justifyContent: 'center', alignItems: 'center', backgroundColor: 'green'}}>
-																<Text style={{color: '#fff', paddingHorizontal: 5}}>Enviado</Text>
-															</Col>
+															{ this.RenderEstado(Remito) }
 															<Col size={1} style={{justifyContent: 'center', alignItems: 'center'}}>
 																<Text style={{color: '#fff', fontSize: 15, fontWeight: 'bold'}}>Fecha:</Text>
 															</Col>

@@ -62,8 +62,9 @@ export default class Observacion extends React.Component {
         .then(resp => resp.json())
         .then(respJson => {
             if (respJson.Error) throw 'Error al quere guardar la observacion para el producto ' + this.Producto + ' para el Pedido ' + this.Pedido;
-            this.setState({Sending: false});
-            this.goBack();
+            this.setState({Sending: false}, () => {
+                this.props.navigation.goBack();
+            });
         })
         .catch(err => console.log(err));
     }
@@ -77,6 +78,10 @@ export default class Observacion extends React.Component {
         ]);
     };
 
+    ContenidoBoton(){
+        if (this.state.Sending) return (<Spinner color={Config.bgColorSecundario} />);
+        return (<Text>Grabar</Text>);
+    }
     render(){
         if (this.state.loading) return (<View><Spinner/></View>);
 
@@ -122,8 +127,7 @@ export default class Observacion extends React.Component {
                                 <Row size={1} style={{marginTop: 10, justifyContent: 'space-around', alignItems: 'flex-start'}}>
                                     <Col style={{paddingHorizontal: 10}}>
                                         <Button block title="" onPress={this.handleOnPress.bind(this)} disabled={this.state.Sending}>
-                                            <Spinner color={Config.bgColorTerciario} style={{width: this.state.Sending ? 50 : 0, opacity: this.state.Sending ? 1 : 0}} />
-                                            <Text>Grabar</Text>
+                                            {this.ContenidoBoton()}
                                         </Button>
                                     </Col>
                                     <Col style={{paddingHorizontal: 10}}>

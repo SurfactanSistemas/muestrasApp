@@ -22,7 +22,8 @@ export default class DetallesPedido extends React.Component{
             showError: false,
             msgError: '',
             tamanioWidth: 0, //Dimensions.get('window').width,
-            fontLoaded: true
+            fontLoaded: true,
+            Sending: false
         };
     }
 
@@ -49,7 +50,7 @@ export default class DetallesPedido extends React.Component{
         this.setState({passVendedor: text, msgError: ''})};
 
     handleOnPress = async () => {
-        this.setState({showError: false, msgError: ''});
+        this.setState({showError: false, msgError: '', Sending: true});
 
         let Clave = this.state.passVendedor;
 
@@ -65,19 +66,25 @@ export default class DetallesPedido extends React.Component{
                     let _idVendedor = resJson[0].Table[0].Vendedor;
 
                     if (_idVendedor > 0){
-                        this.props.navigation.navigate('Listado', {idVendedor: _idVendedor});
+                        this.setState({Sending: false}, () => {
+                            this.props.navigation.navigate('Listado', {idVendedor: _idVendedor});
+                        });
                     }else{
                         this.txtInput._root.clear();
-                        this.setState({showError: true, msgError: 'La clave indicada no es una cláve válida. Vuela a intentar.'});
+                        this.setState({showError: true, msgError: 'La clave indicada no es una cláve válida. Vuela a intentar.', Sending: false});
                     }
                 })
                 .catch((err) => {
-                    this.setState({showError: true, msgError: err});
+                    this.setState({showError: true, msgError: err, Sending: false});
                     this.txtInput._root.clear();
                 });
         });
     };
 
+    textoBoton(){
+        if (!this.state.Sending) return (<Text style={{color: '#fff'}}>Iniciar Sesión</Text>);
+        return (<Spinner color={Config.bgColor}/>);
+    }
     render(){
         if (this.state.fontLoaded){
             return ( <Spinner /> )
@@ -105,8 +112,8 @@ export default class DetallesPedido extends React.Component{
                                 onSubmitEditing={this.handleOnPress}
                             />
                         </Item>
-                        <Button block style={{ marginTop: 15}} onPress={this.handleOnPress}>
-                            <Text>Iniciar Sesión</Text>
+                        <Button block style={{ marginTop: 15}} onPress={this.handleOnPress} disabled={this.state.Sending}>
+                            {this.textoBoton()}
                         </Button>
                     </Form>
                     <View>
