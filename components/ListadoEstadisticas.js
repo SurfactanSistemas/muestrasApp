@@ -9,7 +9,7 @@ import {Col, Row, Grid} from 'react-native-easy-grid';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
-export default class ListadoMuestras extends React.Component{
+export default class ListadoEstadisticas extends React.Component{
     
     static navigationOptions = ({navigation}) => {
         return {
@@ -37,7 +37,7 @@ export default class ListadoMuestras extends React.Component{
     componentDidMount(){
         //this.setState({idVendedor: this.props.navigation.getParam('idVendedor', -1)});
         // Obtenemos los años para el Picker.
-        this.ConsultarAniosPosibles();
+        //this.ConsultarAniosPosibles();
         return this._ReGenerarItems();
         this.setState({refrescando: false, heightDevice: Dimensions.get('screen').height});
     }
@@ -51,21 +51,13 @@ export default class ListadoMuestras extends React.Component{
         });
     }
 
-    ConsultarUrlConsulta() {
-        return fetch('https://raw.githubusercontent.com/fergthh/surfac/master/muestrasDBURL.json')
-                    .then((response) => response.json())
-                    .then((responseJson) => {
-                        this.setState({urlConsulta: responseJson[0].url + '/todas/' + this.state.idVendedor});
-                    })
-    }
-
     _ReGenerarItems(){
 
         if (this.state.idVendedor <= 0) return;
 
         this.setState({refrescando: true});
 
-        return Config.Consultar('Muestras/' + this.state.idVendedor + '/' + this.state.AnioConsulta, (resp) => {
+        return Config.Consultar('Estadisticas/' + this.state.idVendedor + '/' + this.state.AnioConsulta, (resp) => {
             resp.then((response) => response.json())
                 .then((responseJson) => {
                     let _datos = [];
@@ -73,20 +65,21 @@ export default class ListadoMuestras extends React.Component{
                     if (responseJson.length > 0) {
                         let res = _(responseJson)
                                     .groupBy('Vendedor')
-                                    .map((muestras, vend) => (
+                                    .map((Ventas, vend) => (
                                         {
                                             Vendedor: vend,
-                                            DesVendedor: muestras[0].DesVendedor,
-                                            Datos: _(muestras).groupBy('Cliente')
-                                                              .map((pedidos, cli) => (
+                                            DesVendedor: Ventas[0].DesVendedor,
+                                            Datos: _(Ventas).groupBy('Cliente')
+                                                              .map((Clientes, cli) => (
                                                                 {
                                                                     Cliente: cli,
-                                                                    Razon: pedidos[0].Razon,
-                                                                    Datos: _(pedidos).groupBy('Pedido')
-                                                                                     .map((pedido, ped) => (
+                                                                    DesCliente: Clientes[0].DesCliente,
+                                                                    Datos: _(Clientes).groupBy('Producto')
+                                                                                     .map((Productos, prod) => (
                                                                                         {
-                                                                                            Pedido: ped,
-                                                                                            Datos: pedido
+                                                                                            Producto: prod,
+                                                                                            DesProducto: Productos[0].DescTerminado,
+                                                                                            Datos: Productos
                                                                                         }
                                                                                      )).value()
                                                                 }
@@ -133,7 +126,7 @@ export default class ListadoMuestras extends React.Component{
 
                 let filtrados = _.filter(vendedor.Datos, (Cliente) => {
                     let regex1 = new RegExp(val.toUpperCase());
-                    return regex1.test(Cliente.Razon.toUpperCase()) || regex1.test(Cliente.Cliente.toUpperCase()) ;
+                    return regex1.test(Cliente.DesCliente.toUpperCase()) || regex1.test(Cliente.Cliente.toUpperCase()) ;
                 });
 
                 if (filtrados.length > 0)
@@ -171,11 +164,12 @@ export default class ListadoMuestras extends React.Component{
                         // onValueChange={this.onValueChange.bind(this)}
                         onValueChange={(val) => this._handlePickAnio(val)}
                         >
-                            {this.state.Anios.map((anio) => {
+                        <Picker.Item key='2018' label='2018' value='2018' />
+                            {/* {this.state.Anios.map((anio) => {
                                 return (
                                     <Picker.Item key={anio.Valor} label={anio.Valor} value={anio.Valor} />
                                 )
-                            })}
+                            })} */}
                         </Picker>
                     </View>
                 </Header>
@@ -185,14 +179,14 @@ export default class ListadoMuestras extends React.Component{
                         renderRow={(item) => {
                             return (
                                 <View key={item.Vendedor}>
-                                    <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center'}}>
-                                        <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor}</Text>
+                                    <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center'}}>
+                                        <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor.trim()}</Text>
                                     </ListItem>
                                     <List
                                         dataArray={item.Datos}
                                         renderRow={(itemCliente) => {
                                            return (
-                                                <ListItem key={itemCliente.Cliente} onPress={() => {this.props.navigation.navigate('Detalles', {Cliente: itemCliente})}}>
+                                                <ListItem key={itemCliente.Cliente} onPress={() => {this.props.navigation.navigate('DetallesVentasProductos', {ClienteProductos: [itemCliente]})}}>
                                                     <View key={itemCliente.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
 
                                                         <View style={{flexDirection: 'row'}}>
@@ -200,13 +194,13 @@ export default class ListadoMuestras extends React.Component{
                                                                 ({itemCliente.Cliente})
                                                             </Text>
                                                             <Text style={{marginLeft: 30}}>
-                                                                {itemCliente.Razon}
+                                                                {itemCliente.DesCliente}
                                                             </Text>
                                                         </View>
                                                         
                                                         <Text style={{fontSize: 10, fontStyle: 'italic'}}>
 
-                                                            {itemCliente.Datos.length} Pedido(s)
+                                                            {itemCliente.Datos.length} Productos(s)
 
                                                         </Text>
                                                     </View>

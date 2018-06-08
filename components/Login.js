@@ -3,6 +3,9 @@ import {StyleSheet, View, TextInput, ScrollView, Image, Dimensions} from 'react-
 import { createStackNavigator} from 'react-navigation';
 import Config from '../config/config.js';
 import { Container, Text, Header, Content, Form, Item, Input, Label, Icon, Button, Spinner } from 'native-base';
+import { Grid, Col, Row } from 'react-native-easy-grid';
+
+const MSG_CLAVE_ERRONEA = 'La clave indicada no es una cláve válida. Vuela a intentar.';
 
 export default class DetallesPedido extends React.Component{
     
@@ -61,7 +64,7 @@ export default class DetallesPedido extends React.Component{
                 .then((resJson) => {
                     if (resJson.length == 0) {
                         this.txtInput._root.clear();
-                        throw 'La clave indicada no es una cláve válida. Vuela a intentar.';
+                        throw MSG_CLAVE_ERRONEA;
                     }
                     let _idVendedor = resJson[0].Table[0].Vendedor;
 
@@ -71,7 +74,7 @@ export default class DetallesPedido extends React.Component{
                         });
                     }else{
                         this.txtInput._root.clear();
-                        this.setState({showError: true, msgError: 'La clave indicada no es una cláve válida. Vuela a intentar.', Sending: false});
+                        this.setState({showError: true, msgError: MSG_CLAVE_ERRONEA, Sending: false});
                     }
                 })
                 .catch((err) => {
@@ -102,20 +105,28 @@ export default class DetallesPedido extends React.Component{
                             <Text style={[styles.titleHeader]}>Inicio de Sesión</Text>
                         </View>
                     </View>
-                        
-                    <Form style={styles.loginFormContainer}>
-                        <Item floatingLabel last>
-                            <Icon active name='key' style={styles.loginFormIconInput}/>
-                            <Label style={{color: '#fff', marginLeft: 5}}>Contraseña...</Label>
-                            <Input getRef={i => this.txtInput = i} secureTextEntry={true} style={[styles.InputText, {width: this.state.tamanioWidth}]}
-                                onChangeText={this.handleOnChangeText}
-                                onSubmitEditing={this.handleOnPress}
-                            />
-                        </Item>
-                        <Button block style={{ marginTop: 15}} onPress={this.handleOnPress} disabled={this.state.Sending}>
-                            {this.textoBoton()}
-                        </Button>
-                    </Form>
+
+                    <Grid>
+                        <Col>
+                            <Form style={styles.loginFormContainer}>
+                                <Row>
+                                    <Item floatingLabel last style={{flex: 1}}>
+                                        <Icon active name='key' style={styles.loginFormIconInput}/>
+                                        <Label style={{color: '#fff', marginLeft: 5}}>Contraseña...</Label>
+                                        <Input getRef={i => this.txtInput = i} secureTextEntry={true} style={[styles.InputText, {width: this.state.tamanioWidth}]}
+                                            onChangeText={this.handleOnChangeText}
+                                            onSubmitEditing={this.handleOnPress}
+                                        />
+                                    </Item>
+                                </Row>
+                                <Row style={{justifyContent: 'center'}}>
+                                    <Button block style={{ flex: 1, marginTop: 15}} onPress={this.handleOnPress} disabled={this.state.Sending}>
+                                        {this.textoBoton()}
+                                    </Button>
+                                </Row>
+                            </Form>                            
+                        </Col>
+                    </Grid>                    
                     <View>
                         <Text style={{color: 'yellow', fontSize: 15, textAlign: 'center'}}>{this.state.msgError}</Text>
                     </View>
@@ -150,5 +161,8 @@ const styles = StyleSheet.create({
     loginFormIconInput: {
         color: '#fff',
         marginRight: 5
+    },
+    loginFormIconInputRemove: {
+        color: '#fff'
     }
 });
