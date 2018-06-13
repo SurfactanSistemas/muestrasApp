@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
-import { createStackNavigator} from 'react-navigation';
+import { View } from 'react-native';
 import HeaderNav from './HeaderNav.js';
 import { Grid, Col, Row } from 'react-native-easy-grid';
-import { Text, Textarea, Button, Spinner } from 'native-base';
+import { Text, Button, Spinner } from 'native-base';
 import Config from '../config/config';
 
-export default class Menu extends React.Component {
+export default class Menu extends React.PureComponent {
 
     static navigationOptions = {
         headerTitle: <HeaderNav />,
@@ -86,5 +85,3 @@ export default class Menu extends React.Component {
         )
     }
 }
-
-const styles = StyleSheet.create({});

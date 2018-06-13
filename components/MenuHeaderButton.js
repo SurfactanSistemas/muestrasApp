@@ -3,7 +3,7 @@ import {View, TouchableOpacity } from 'react-native';
 import { Icon } from 'native-base';
 import { createStackNavigator} from 'react-navigation';
 
-export default class MenuHeaderButton extends React.Component {
+export default class MenuHeaderButton extends React.PureComponent {
     constructor(props){
         super(props);
     }

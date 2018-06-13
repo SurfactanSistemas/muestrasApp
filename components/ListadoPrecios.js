@@ -1,19 +1,16 @@
 import React from 'react';
-import {StyleSheet, Image, View, FlatList, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js';
+import { View, FlatList, Dimensions} from 'react-native';
 import MenuHeaderButton from './MenuHeaderButton';
 import HeaderNav from './HeaderNav.js';
-import { Container, Text, Content, List, ListItem, Separator, Spinner, Icon, Header, Item, Button, Input, Picker } from 'native-base';
-import {Col, Row, Grid} from 'react-native-easy-grid';
+import { Container, Text, Content, ListItem, Spinner, Icon, Header, Item, Input } from 'native-base';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
-export default class ListadoPrecios extends React.Component{
+export default class ListadoPrecios extends React.PureComponent{
     
     static navigationOptions = ({navigation}) => {
         return {
-            headerTitle: <HeaderNav />,
+            headerTitle: <HeaderNav section="Precios por Cliente" />,
             headerRight: <MenuHeaderButton navigation={navigation} />
         };
     };
@@ -35,10 +32,7 @@ export default class ListadoPrecios extends React.Component{
     }
 
     componentDidMount(){
-        //this.setState({idVendedor: this.props.navigation.getParam('idVendedor', -1)});
-        // Obtenemos los años para el Picker.
-        //this.ConsultarAniosPosibles();
-        return this._ReGenerarItems();
+        this._ReGenerarItems();
         this.setState({refrescando: false, heightDevice: Dimensions.get('screen').height});
     }
 
@@ -88,11 +82,9 @@ export default class ListadoPrecios extends React.Component{
                 })
                 .catch((error) => console.error(error));
         });
-
-        this.setState({refrescando: false});
     }
 
-    _KeyExtractor = (item, index) => item.Pedido + '';
+    _KeyExtractor = (item) => item.Pedido + '';
 
     _handlePickAnio(val){
         this.setState({AnioConsulta: val, textFilter: '', primeraVez: true}, this._ReGenerarItems);
@@ -100,24 +92,17 @@ export default class ListadoPrecios extends React.Component{
 
     _handleChangeTextFiltro(val){
         this.setState({textFilter: val.trim()});
-
-        let itemsOriginales = this.state.datos;
         let _itemsFiltrados = [];
         if (val.trim() == ""){
             _itemsFiltrados = this.state.datos;
         }else{
-
+            const regex1 = new RegExp(val.toUpperCase());
             _.forEach(this.state.datos, (vendedor) => {
-                let exist = false;
-
                 let filtrados = _.filter(vendedor.Datos, (Cliente) => {
-                    let regex1 = new RegExp(val.toUpperCase());
                     return regex1.test(Cliente.DesCliente.toUpperCase()) || regex1.test(Cliente.Cliente.toUpperCase()) ;
                 });
-
                 if (filtrados.length > 0)
                     _itemsFiltrados.push({Vendedor: vendedor.Vendedor, DesVendedor: vendedor.DesVendedor, Datos: filtrados});
-
             });
         }
 
@@ -133,7 +118,7 @@ export default class ListadoPrecios extends React.Component{
                          <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
                              ({item.Cliente})
                          </Text>
-                         <Text style={{marginLeft: 30}}>
+                         <Text style={{marginLeft: 30, maxWidth: 230}}>
                              {item.DesCliente}
                          </Text>
                      </View>
@@ -198,8 +183,8 @@ export default class ListadoPrecios extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        // backgroundColor: '#d6deeb'
-    }
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         // backgroundColor: '#d6deeb'
+//     }
+// });

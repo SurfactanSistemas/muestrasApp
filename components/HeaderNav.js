@@ -1,12 +1,32 @@
 import React from 'react';
 import {Text, Image, View, StyleSheet} from 'react-native';
 
-export default class HeaderNav extends React.Component {
+export default class HeaderNav extends React.PureComponent {
+
+    static defaultProps = {
+        section: null
+    }
+
+    constructor(props){
+        super(props);
+    }
+
+    tituloSecundario = () => (
+        <Text style={styles.tituloSecundario}>
+            {this.props.section}
+        </Text>
+    )
+
     render(){
         return (
-            <View style={styles.header}>
+            <View style={[styles.header, {flexDirection: 'row', flex: 1, justifyContent: 'space-around'}]}>
                 <Image style = {{height: 50, width: 75}} source={require('../assets/img/surfaclogo.png')} />
-                <Text style={styles.titulo}>SURFACTAN S.A.</Text>
+                <View>
+                    <Text style={styles.titulo}>
+                        SURFACTAN S.A.
+                    </Text>
+                    {this.tituloSecundario()}
+                </View>
             </View>
         )
     }
@@ -20,12 +40,19 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: 'center'
     },
+    tituloSecundario: {
+        // fontWeight: 'bold',
+        fontSize: 14,
+        color: '#FFF',
+        flex: 1,
+        textAlign: 'center'
+    },
     header: {
         backgroundColor: '#133c74',
-        padding: 80,
+        // padding: 80,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-around',
-        //marginTop: 65
+        justifyContent: 'center',
+        flex: 1
     }
 });

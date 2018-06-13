@@ -1,15 +1,11 @@
 import React from 'react';
-import {StyleSheet, Text, Image, View, Linking, ScrollView, TouchableHighlight} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js'
-import Header from './Header.js';
+import { Text, View, TouchableHighlight} from 'react-native';
 import HeaderNav from './HeaderNav.js';
 import { Container, Content, List, Badge } from 'native-base';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 import Config from '../config/config';
-import config from '../config/config';
 
-export default class DetallesPedido extends React.Component{
+export default class DetallesPedido extends React.PureComponent{
 	
 	static navigationOptions = {
 		headerTitle: <HeaderNav />,
@@ -50,8 +46,8 @@ export default class DetallesPedido extends React.Component{
 						<Grid>
 							<Row size={1}>
 								<Col style={{backgroundColor: Config.bgColorSecundario}}>
-									<Row style={{alignItems: 'center', justifyContent: 'center'}}>
-										<Text style={{fontWeight: 'bold', color: '#fff', fontSize: 25}}>{Cliente.Razon}</Text>
+									<Row style={{alignItems: 'center', justifyContent: 'center', padding: 10}}>
+										<Text style={{fontWeight: 'bold', color: '#fff', fontSize: 25, textAlign: 'center'}}>{Cliente.Razon}</Text>
 									</Row>
 									<Row style={{alignItems: 'center', justifyContent: 'center'}}>
 										<Text style={{fontStyle: 'italic', color: '#fff', fontSize: 15}}>{Cliente.Datos[0].Datos[0].DesVendedor}</Text>
@@ -154,45 +150,3 @@ export default class DetallesPedido extends React.Component{
 		}
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		backgroundColor: '#fff',
-		padding: 20,
-	},
-	TituloSeccion: {
-		color: '#fff',
-		backgroundColor: Config.bgColorSecundario,
-		padding: 15,
-	},
-	EncabezadoPedido: {
-		flexDirection: 'row',
-	},
-	EncabezadoNumeroPedido: {
-		flexDirection: 'row',
-		fontSize: 15,
-		fontWeight: 'bold',
-		backgroundColor: 'red',
-		padding: 15
-	},
-	EstadoContainer: {
-		backgroundColor: 'yellow',
-		padding: 15,
-	},
-	EstadoPedido: {
-		fontSize: 15,
-		color: '#fff',
-		fontWeight: 'bold',
-		fontStyle: 'italic',
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderRadius: 0,
-		paddingTop: 5,
-		paddingBottom: 5,
-
-	},
-	FechaPedido: {
-		justifyContent: 'flex-end',
-		backgroundColor: 'gray'
-	}
-});

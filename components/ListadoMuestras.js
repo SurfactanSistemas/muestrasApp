@@ -1,11 +1,8 @@
 import React from 'react';
-import {StyleSheet, Image, View, FlatList, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js';
+import { View, Dimensions} from 'react-native';
 import MenuHeaderButton from './MenuHeaderButton';
 import HeaderNav from './HeaderNav.js';
-import { Container, Text, Content, List, ListItem, Separator, Spinner, Icon, Header, Item, Button, Input, Picker } from 'native-base';
-import {Col, Row, Grid} from 'react-native-easy-grid';
+import { Container, Text, Content, List, ListItem, Spinner, Icon, Header, Item, Input, Picker } from 'native-base';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
@@ -13,7 +10,7 @@ export default class ListadoMuestras extends React.Component{
     
     static navigationOptions = ({navigation}) => {
         return {
-            headerTitle: <HeaderNav />,
+            headerTitle: <HeaderNav section="Muestras"/>,
             headerRight: <MenuHeaderButton navigation={navigation} />
         };
     };
@@ -38,7 +35,7 @@ export default class ListadoMuestras extends React.Component{
         //this.setState({idVendedor: this.props.navigation.getParam('idVendedor', -1)});
         // Obtenemos los años para el Picker.
         this.ConsultarAniosPosibles();
-        return this._ReGenerarItems();
+        this._ReGenerarItems();
         this.setState({refrescando: false, heightDevice: Dimensions.get('screen').height});
     }
 
@@ -115,35 +112,64 @@ export default class ListadoMuestras extends React.Component{
 
     _KeyExtractor = (item, index) => item.Pedido + '';
 
-    _handlePickAnio(val){
+    _handlePickAnio = (val) => {
         this.setState({AnioConsulta: val, textFilter: '', primeraVez: true}, this._ReGenerarItems);
     }
 
-    _handleChangeTextFiltro(val){
+    _handleChangeTextFiltro = (val) => {
         this.setState({textFilter: val.trim()});
 
-        let itemsOriginales = this.state.datos;
         let _itemsFiltrados = [];
         if (val.trim() == ""){
             _itemsFiltrados = this.state.datos;
         }else{
-
+            const regex1 = new RegExp(val.toUpperCase());
             _.forEach(this.state.datos, (vendedor) => {
-                let exist = false;
-
                 let filtrados = _.filter(vendedor.Datos, (Cliente) => {
-                    let regex1 = new RegExp(val.toUpperCase());
                     return regex1.test(Cliente.Razon.toUpperCase()) || regex1.test(Cliente.Cliente.toUpperCase()) ;
                 });
-
                 if (filtrados.length > 0)
                     _itemsFiltrados.push({Vendedor: vendedor.Vendedor, DesVendedor: vendedor.DesVendedor, Datos: filtrados});
-
             });
         }
-
         this.setState({itemsFiltrados: _itemsFiltrados});
     }
+
+    handleOnPressDetalles = (parameters) => this.props.navigation.navigate('Detalles', parameters); 
+
+    RenderCliente = itemCliente => (
+            <ListItem key={itemCliente.Cliente} onPress={() => this.handleOnPressDetalles({Cliente: itemCliente})}>
+                <View key={itemCliente.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize: 10, fontStyle: 'italic'}}>
+                            ({itemCliente.Cliente})
+                        </Text>
+                        <Text style={{marginLeft: 10, maxWidth: 230}}>
+                            {itemCliente.Razon.trim()}
+                        </Text>
+                    </View>
+                    
+                    <Text style={{fontSize: 10, fontStyle: 'italic'}}>
+
+                        {itemCliente.Datos.length} Pedido(s)
+
+                    </Text>
+                </View>
+            </ListItem>
+    )
+
+    RenderVendedor = item => (
+        <View key={item.Vendedor}>
+            <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center'}}>
+                <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor}</Text>
+            </ListItem>
+            <List
+                dataArray={item.Datos}
+                renderRow={this.RenderCliente}>
+            </List>
+        </View>
+    )
 
     render(){
         if (this.state.refrescando) return (
@@ -159,7 +185,7 @@ export default class ListadoMuestras extends React.Component{
                 <Header searchBar rounded  style={{backgroundColor: Config.bgColorSecundario}}>
                     <Item style={{flex: 2}}>
                         <Icon name="ios-search" />
-                        <Input placeholder="Search" onChangeText={(val) => {this._handleChangeTextFiltro(val)}} value={this.state.textFilter}/>
+                        <Input placeholder="Search" onChangeText={this._handleChangeTextFiltro} value={this.state.textFilter}/>
                     </Item>
                     <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', paddingLeft: 20, minWidth: 80}}>
                         <Text style={{color: '#fff'}}>Periodo:</Text>
@@ -169,55 +195,16 @@ export default class ListadoMuestras extends React.Component{
                         selectedValue={this.state.AnioConsulta}
                         style={{color: '#fff'}}
                         // onValueChange={this.onValueChange.bind(this)}
-                        onValueChange={(val) => this._handlePickAnio(val)}
+                        onValueChange={this._handlePickAnio}
                         >
-                            {this.state.Anios.map((anio) => {
-                                return (
-                                    <Picker.Item key={anio.Valor} label={anio.Valor} value={anio.Valor} />
-                                )
-                            })}
+                            {this.state.Anios.map(anio => <Picker.Item key={anio.Valor} label={anio.Valor} value={anio.Valor} /> )}
                         </Picker>
                     </View>
                 </Header>
                 <Content>
                     <List
                         dataArray={this.state.itemsFiltrados}
-                        renderRow={(item) => {
-                            return (
-                                <View key={item.Vendedor}>
-                                    <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center'}}>
-                                        <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor}</Text>
-                                    </ListItem>
-                                    <List
-                                        dataArray={item.Datos}
-                                        renderRow={(itemCliente) => {
-                                           return (
-                                                <ListItem key={itemCliente.Cliente} onPress={() => {this.props.navigation.navigate('Detalles', {Cliente: itemCliente})}}>
-                                                    <View key={itemCliente.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-
-                                                        <View style={{flexDirection: 'row'}}>
-                                                            <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
-                                                                ({itemCliente.Cliente})
-                                                            </Text>
-                                                            <Text style={{marginLeft: 30}}>
-                                                                {itemCliente.Razon}
-                                                            </Text>
-                                                        </View>
-                                                        
-                                                        <Text style={{fontSize: 10, fontStyle: 'italic'}}>
-
-                                                            {itemCliente.Datos.length} Pedido(s)
-
-                                                        </Text>
-                                                    </View>
-                                                </ListItem>
-                                           ) 
-                                        }}>
-                                        
-                                    </List>
-                                </View>
-                            )
-                        }}
+                        renderRow={this.RenderVendedor}
                     >
 
                     </List>
@@ -227,8 +214,8 @@ export default class ListadoMuestras extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        // backgroundColor: '#d6deeb'
-    }
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         // backgroundColor: '#d6deeb'
+//     }
+// });

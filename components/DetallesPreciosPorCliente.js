@@ -1,15 +1,13 @@
 import React from 'react';
-import {StyleSheet, Image, View, FlatList, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js';
+import {StyleSheet, View, Dimensions} from 'react-native';
 import MenuHeaderButton from './MenuHeaderButton';
 import HeaderNav from './HeaderNav.js';
-import { Container, Text, Content, List, ListItem, Separator, Spinner, Icon, Header, Item, Button, Input, Picker } from 'native-base';
+import { Container, Text, Content, Spinner, Icon, Header, Item, Input } from 'native-base';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
-export default class DetallesPreciosPorCliente extends React.Component{
+export default class DetallesPreciosPorCliente extends React.PureComponent{
     
     static navigationOptions = ({navigation}) => {
         return {
@@ -39,10 +37,6 @@ export default class DetallesPreciosPorCliente extends React.Component{
     }
 
     componentDidMount(){
-        //this.setState({idVendedor: this.props.navigation.getParam('idVendedor', -1)});
-        // Obtenemos los años para el Picker.
-        //this.ConsultarAniosPosibles();
-
         this.setState(
             {
                 refrescando: true
@@ -113,26 +107,16 @@ export default class DetallesPreciosPorCliente extends React.Component{
     _handleChangeTextFiltro(val){
         this.setState({textFilter: val.trim()});
 
-        let itemsOriginales = this.state.datos;
         let _Productos = [];
         if (val.trim() == ""){
             _Productos = this.state.Productos;
         }else{
-
+            const regex1 = new RegExp(val.toUpperCase());
             let filtrados = _.filter(this.state.Productos, (Producto) => {
-                let regex1 = new RegExp(val.toUpperCase());
                 return regex1.test(Producto.Terminado.toUpperCase()) || regex1.test(Producto.DesTerminado.toUpperCase()) ;
             });
 
             _Productos = filtrados;
-            // if (filtrados.length > 0)
-            //     _itemsFiltrados.push({Cliente: cliente.Cliente, DesCliente: cliente.DesCliente, Datos: filtrados});
-
-            // _.forEach(this.state.Productos, (Producto) => {
-            //     let exist = false;
-
-                
-            // });
         }
 
         this.setState({ProductosFiltrados: _Productos});
@@ -142,13 +126,19 @@ export default class DetallesPreciosPorCliente extends React.Component{
         return (
             <Row key={key} style={styles.row}>
                 <Col size={3} style={[styles.bloqueBlanco, {borderRightColor: '#ccc', borderRightWidth: 1}]}>
-                    <Text style={styles.textoBloqueBlanco}>{Prod.Terminado}</Text>
+                    <View>
+                        <Text style={styles.textoBloqueBlanco}>{Prod.Terminado}</Text>
+                    </View>
                 </Col>
-                <Col size={7} style={[styles.bloqueBlanco, {borderRightColor: '#ccc', borderRightWidth: 1, justifyContent: 'flex-end'}]}>
-                    <Text style={styles.textoBloqueBlanco}>{Prod.DesTerminado.trim()}</Text>
+                <Col size={7} style={[styles.bloqueBlanco, {borderRightColor: '#ccc', borderRightWidth: 1, alignItems: 'flex-start'}]}>
+                    <View>
+                        <Text style={[styles.textoBloqueBlanco, {paddingLeft: 5}]}>{Prod.DesTerminado.trim()}</Text>
+                    </View>
                 </Col>
                 <Col size={2} style={[styles.bloqueBlanco, {borderRightColor: '#ccc', borderRightWidth: 1}]}>
-                    <Text style={styles.textoBloqueBlanco}>{parseFloat(Prod.Valor).toFixed(2)}</Text>
+                    <View>
+                        <Text style={styles.textoBloqueBlanco}>{parseFloat(Prod.Valor).toFixed(2)}</Text>
+                    </View>
                 </Col>
             </Row>
         )
@@ -162,8 +152,6 @@ export default class DetallesPreciosPorCliente extends React.Component{
                 </Content>
             </Container>
         );
-        // const {Cliente, DesCliente} = this.state.itemsFiltrados[0];
-        // const Productos = this.state.itemsFiltrados[0].Datos;
         return (
             <Container>
                 <Header searchBar rounded  style={{backgroundColor: Config.bgColorSecundario}}>
@@ -172,20 +160,9 @@ export default class DetallesPreciosPorCliente extends React.Component{
                         <Input placeholder="Search" onChangeText={(val) => {this._handleChangeTextFiltro(val)}} value={this.state.textFilter}/>
                     </Item>
                     <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', paddingLeft: 20, minWidth: 80}}>
-                        {/* <Text style={{color: '#fff'}}>Período:</Text> */}
-                        {/* <Picker
-                        iosHeader="Select one"
-                        mode="dropdown"
-                        selectedValue={this.state.AnioConsulta}
-                        style={{color: '#fff'}}
-                        // onValueChange={this.onValueChange.bind(this)}
-                        onValueChange={(val) => this._handlePickAnio(val)}
-                        >
-                        <Picker.Item key='2018' label='2018' value='2018' />
-                        </Picker> */}
                     </View>
                 </Header>
-                <Content>
+                <Content style={styles.container}>
                     <Grid>
                         <Row style={[styles.row, {marginTop: 30}]}>
                             <Col size={2} style={styles.bloqueAzul} >
@@ -222,13 +199,12 @@ export default class DetallesPreciosPorCliente extends React.Component{
 
 const styles = StyleSheet.create({
     container: {
-        // backgroundColor: '#fff'
+        backgroundColor: '#fff'
     },
     row: {
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
-        // padding: 10,
-        marginHorizontal: 20
+        marginHorizontal: 5
     },
     textoBloqueBlanco: {
         fontSize: 12,
@@ -245,7 +221,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     bloqueBlanco: {
-        backgroundColor: '#fff',
+        backgroundColor: '#eee',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10

@@ -1,19 +1,52 @@
 import React from 'react';
-import {StyleSheet, Image, View, FlatList, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js';
+import { View, Dimensions} from 'react-native';
 import MenuHeaderButton from './MenuHeaderButton';
 import HeaderNav from './HeaderNav.js';
-import { Container, Text, Content, List, ListItem, Separator, Spinner, Icon, Header, Item, Button, Input, Picker } from 'native-base';
-import {Col, Row, Grid} from 'react-native-easy-grid';
+import { Container, Text, Content, List, ListItem, Spinner, Icon, Header, Item, Input, Picker } from 'native-base';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
-export default class ListadoEstadisticas extends React.Component{
+const RenderItem = ({itemCliente, navigation}) => {
+    return (
+    <ListItem key={itemCliente.Cliente} onPress={() => {navigation.navigate('DetallesVentasProductos', {ClienteProductos: [itemCliente]})}}>
+        <View key={itemCliente.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+
+            <View style={{flexDirection: 'row'}}>
+                <Text style={{fontSize: 10, fontStyle: 'italic'}}>
+                    ({itemCliente.Cliente})
+                </Text>
+                <Text style={{marginLeft: 10, maxWidth: 230}}>
+                    {itemCliente.DesCliente.trim()}
+                </Text>
+            </View>
+            
+            <Text style={{fontSize: 10, fontStyle: 'italic'}}>
+
+                {itemCliente.Datos.length} Productos(s)
+
+            </Text>
+        </View>
+    </ListItem>
+)}
+
+const RenderVendedor = ({item, navigation}) => {
+    return (
+        <View key={item.Vendedor}>
+            <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor.trim()}</Text>
+            </ListItem>
+            <List
+                dataArray={item.Datos}
+                renderRow={(item) => <RenderItem itemCliente={item} navigation={navigation}/>}>
+            </List>
+        </View>
+)}
+
+export default class ListadoEstadisticas extends React.PureComponent{
     
     static navigationOptions = ({navigation}) => {
         return {
-            headerTitle: <HeaderNav />,
+            headerTitle: <HeaderNav section="Estadísticas" />,
             headerRight: <MenuHeaderButton navigation={navigation} />
         };
     };
@@ -114,27 +147,21 @@ export default class ListadoEstadisticas extends React.Component{
 
     _handleChangeTextFiltro(val){
         this.setState({textFilter: val.trim()});
-
-        let itemsOriginales = this.state.datos;
         let _itemsFiltrados = [];
         if (val.trim() == ""){
             _itemsFiltrados = this.state.datos;
         }else{
 
+            const regex1 = new RegExp(val.toUpperCase());
             _.forEach(this.state.datos, (vendedor) => {
-                let exist = false;
-
                 let filtrados = _.filter(vendedor.Datos, (Cliente) => {
-                    let regex1 = new RegExp(val.toUpperCase());
                     return regex1.test(Cliente.DesCliente.toUpperCase()) || regex1.test(Cliente.Cliente.toUpperCase()) ;
                 });
 
                 if (filtrados.length > 0)
                     _itemsFiltrados.push({Vendedor: vendedor.Vendedor, DesVendedor: vendedor.DesVendedor, Datos: filtrados});
-
             });
         }
-
         this.setState({itemsFiltrados: _itemsFiltrados});
     }
 
@@ -176,44 +203,8 @@ export default class ListadoEstadisticas extends React.Component{
                 <Content>
                     <List
                         dataArray={this.state.itemsFiltrados}
-                        renderRow={(item) => {
-                            return (
-                                <View key={item.Vendedor}>
-                                    <ListItem itemHeader key={item.Vendedor} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center'}}>
-                                        <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesVendedor.trim()}</Text>
-                                    </ListItem>
-                                    <List
-                                        dataArray={item.Datos}
-                                        renderRow={(itemCliente) => {
-                                           return (
-                                                <ListItem key={itemCliente.Cliente} onPress={() => {this.props.navigation.navigate('DetallesVentasProductos', {ClienteProductos: [itemCliente]})}}>
-                                                    <View key={itemCliente.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-
-                                                        <View style={{flexDirection: 'row'}}>
-                                                            <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
-                                                                ({itemCliente.Cliente})
-                                                            </Text>
-                                                            <Text style={{marginLeft: 30}}>
-                                                                {itemCliente.DesCliente}
-                                                            </Text>
-                                                        </View>
-                                                        
-                                                        <Text style={{fontSize: 10, fontStyle: 'italic'}}>
-
-                                                            {itemCliente.Datos.length} Productos(s)
-
-                                                        </Text>
-                                                    </View>
-                                                </ListItem>
-                                           ) 
-                                        }}>
-                                        
-                                    </List>
-                                </View>
-                            )
-                        }}
+                        renderRow={(item) => <RenderVendedor item={item} {...this.props} />}
                     >
-
                     </List>
                 </Content>
             </Container>
@@ -221,8 +212,8 @@ export default class ListadoEstadisticas extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        // backgroundColor: '#d6deeb'
-    }
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         // backgroundColor: '#d6deeb'
+//     }
+// });

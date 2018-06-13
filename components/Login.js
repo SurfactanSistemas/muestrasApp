@@ -1,13 +1,12 @@
 import React from 'react';
-import {StyleSheet, View, TextInput, ScrollView, Image, Dimensions} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
+import {StyleSheet, View, Image, Dimensions} from 'react-native';
 import Config from '../config/config.js';
-import { Container, Text, Header, Content, Form, Item, Input, Label, Icon, Button, Spinner } from 'native-base';
+import { Container, Text, Content, Form, Item, Input, Label, Icon, Button, Spinner } from 'native-base';
 import { Grid, Col, Row } from 'react-native-easy-grid';
 
 const MSG_CLAVE_ERRONEA = 'La clave indicada no es una cláve válida. Vuela a intentar.';
 
-export default class DetallesPedido extends React.Component{
+export default class DetallesPedido extends React.PureComponent{
     
     static navigationOptions = {
         headerStyle: {

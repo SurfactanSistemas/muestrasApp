@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
-import { createStackNavigator} from 'react-navigation';
+import { View, StyleSheet, Alert } from 'react-native';
 import HeaderNav from './HeaderNav.js';
 import { Grid, Col, Row } from 'react-native-easy-grid';
 import { Text, Textarea, Button, Spinner } from 'native-base';
 import Config from '../config/config';
 
-export default class Observacion extends React.Component {
+export default class Observacion extends React.PureComponent {
 
     static navigationOptions = {
         headerTitle: <HeaderNav />,

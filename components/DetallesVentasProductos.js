@@ -1,15 +1,55 @@
 import React from 'react';
-import {StyleSheet, Image, View, FlatList, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
-import { createStackNavigator} from 'react-navigation';
-import ItemListado from './ItemListado.js';
+import { View, Dimensions} from 'react-native';
 import MenuHeaderButton from './MenuHeaderButton';
 import HeaderNav from './HeaderNav.js';
-import { Container, Text, Content, List, ListItem, Separator, Spinner, Icon, Header, Item, Button, Input, Picker } from 'native-base';
+import { Container, Text, Content, List, ListItem, Spinner, Icon, Header, Item, Input } from 'native-base';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 import Config from '../config/config.js';
 import _ from 'lodash';
 
-export default class DetallesVentasProductos extends React.Component{
+const RenderProducto = ({producto, navigation}) => (
+    <ListItem key={producto.Cliente} onPress={() => {navigation.navigate('DetallesPreciosVentasProductos', {Producto: producto})}}>
+        <Grid>
+            <Row key={producto.Cliente}>
+                <Col size={3} style={{alignItems: 'flex-start', justifyContent: 'center'}}>
+                    <View>
+                        <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
+                            ({producto.Producto.trim()})
+                        </Text>
+                    </View>
+                </Col>
+                <Col size={7} style={{alignItems: 'flex-start', justifyContent: 'center'}}>
+                    <View style={{maxWidth: 230}}>
+                        <Text>
+                            {producto.DesProducto.trim()}
+                        </Text>
+                    </View>
+                </Col>
+                <Col size={2} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
+                    <View>
+                        <Text style={{fontSize: 10, fontStyle: 'italic'}}>
+                            {producto.Datos.length} Venta(s)
+                        </Text>
+                    </View>
+                </Col>
+            </Row>
+        </Grid>
+    </ListItem>
+)
+
+const RenderVentas = ({item, navigation}) => (
+    <View key={item.Cliente}>
+        <ListItem itemHeader key={item.Cliente} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesCliente.trim()}</Text>
+        </ListItem>
+        <List
+            dataArray={item.Datos}
+            renderRow={(item) => <RenderProducto producto={item} navigation={navigation}/>}>
+        </List>
+    </View>
+)
+
+export default class DetallesVentasProductos extends React.PureComponent{
     
     static navigationOptions = ({navigation}) => {
         return {
@@ -57,66 +97,6 @@ export default class DetallesVentasProductos extends React.Component{
                 });
         });
     }
-
-    // _ReGenerarItems(){
-
-    //     if (this.state.idVendedor <= 0) return;
-
-    //     this.setState({refrescando: true});
-
-    //     return Config.Consultar('Estadisticas/' + this.state.idVendedor + '/' + this.state.AnioConsulta, (resp) => {
-    //         resp.then((response) => response.json())
-    //             .then((responseJson) => {
-    //                 let _datos = [];
-
-    //                 if (responseJson.length > 0) {
-    //                     let res = _(responseJson)
-    //                                 .groupBy('Vendedor')
-    //                                 .map((Ventas, vend) => (
-    //                                     {
-    //                                         Vendedor: vend,
-    //                                         DesVendedor: Ventas[0].DesVendedor,
-    //                                         Datos: _(Ventas).groupBy('Cliente')
-    //                                                           .map((Clientes, cli) => (
-    //                                                             {
-    //                                                                 Cliente: cli,
-    //                                                                 DesCliente: Clientes[0].DesCliente,
-    //                                                                 Datos: _(Clientes).groupBy('Producto')
-    //                                                                                  .map((Productos, prod) => (
-    //                                                                                     {
-    //                                                                                         Producto: prod,
-    //                                                                                         Datos: Productos
-    //                                                                                     }
-    //                                                                                  )).value()
-    //                                                             }
-    //                                                           )).value()
-    //                                     }
-    //                                 ));
-
-    //                     _datos = _.sortBy(res.value(), ['DesVendedor']);
-    //                 }
-
-    //                 if (this.state.primeraVez)
-    //                     this.state.itemsFiltrados = _datos;
-
-    //                 this.setState({
-    //                     primeraVez: false,
-    //                     refrescando: false,
-    //                     datos: _datos
-    //                 });
-
-    //             })
-    //             .catch((error) => console.error(error));
-    //     });
-
-    //     this.setState({refrescando: false});
-    // }
-
-    // _KeyExtractor = (item, index) => item.Pedido + '';
-
-    // _handlePickAnio(val){
-    //     this.setState({AnioConsulta: val, textFilter: '', primeraVez: true}, this._ReGenerarItems);
-    // }
 
     _handleChangeTextFiltro(val){
         this.setState({textFilter: val.trim()});
@@ -177,67 +157,7 @@ export default class DetallesVentasProductos extends React.Component{
                 <Content>
                 <List
                         dataArray={this.state.itemsFiltrados}
-                        renderRow={(item) => {
-                            return (
-                                <View key={item.Cliente}>
-                                    <ListItem itemHeader key={item.Cliente} style={{backgroundColor: Config.bgColorSecundario, justifyContent: 'center', alignItems: 'center'}}>
-                                        <Text style={{color: '#fff', fontSize: 20, marginTop: 10}}>{item.DesCliente.trim()}</Text>
-                                    </ListItem>
-                                    <List
-                                        dataArray={item.Datos}
-                                        renderRow={(itemProducto) => {
-                                           return (
-                                                <ListItem key={itemProducto.Cliente} onPress={() => {this.props.navigation.navigate('DetallesPreciosVentasProductos', {Producto: itemProducto})}}>
-                                                    <Grid>
-                                                        <Row key={itemProducto.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                                            <Col size={2}>
-                                                                <Row>
-                                                                    <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
-                                                                        ({itemProducto.Producto})
-                                                                    </Text>
-                                                                </Row>
-                                                            </Col>
-                                                            <Col size={8} style={{alignItems: 'flex-start'}}>
-                                                                <Row>
-                                                                    <Text style={{flex: 1}}>
-                                                                        {itemProducto.DesProducto.trim()}
-                                                                    </Text>
-                                                                </Row>
-                                                            </Col>
-                                                            <Col size={2}>
-                                                                <Row>
-                                                                    <Text style={{fontSize: 10, fontStyle: 'italic'}}>
-                                                                        {itemProducto.Datos.length} Venta(s)
-                                                                    </Text>
-                                                                </Row>
-                                                            </Col>
-                                                        </Row>
-                                                    </Grid>
-                                                    {/* <View key={itemProducto.Cliente} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-
-                                                        <View style={{flexDirection: 'row'}}>
-                                                            <Text style={{fontSize: 10, fontStyle: 'italic', marginRight: 10}}>
-                                                                ({itemProducto.Producto})
-                                                            </Text>
-                                                            <Text style={{marginLeft: 30}}>
-                                                                {itemProducto.DesProducto}
-                                                            </Text>
-                                                        </View>
-                                                        
-                                                        <Text style={{fontSize: 10, fontStyle: 'italic'}}>
-
-                                                            {itemProducto.Datos.length} Ventas(s)
-
-                                                        </Text>
-                                                    </View> */}
-                                                </ListItem>
-                                           ) 
-                                        }}>
-                                        
-                                    </List>
-                                </View>
-                            )
-                        }}
+                        renderRow={(item) => <RenderVentas item={item} {...this.props}/> }
                     >
 
                     </List>
@@ -246,9 +166,3 @@ export default class DetallesVentasProductos extends React.Component{
         )
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        // backgroundColor: '#d6deeb'
-    }
-});

@@ -19,7 +19,7 @@ const ConsultarUrlConsulta = (urlConsulta, callback) => {
                 })
 }
 
-const Consultar = (urlConsulta, callback) => {
+const Consultar = async (urlConsulta, callback) => {
     //ConsultarUrlConsulta(urlConsulta, callback);
     callback(fetch(BASE_URL + urlConsulta));
 }
