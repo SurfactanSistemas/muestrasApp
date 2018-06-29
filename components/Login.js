@@ -69,7 +69,7 @@ export default class DetallesPedido extends React.PureComponent{
 
                     if (_idVendedor > 0){
                         this.setState({Sending: false}, () => {
-                            this.props.navigation.navigate('Listado', {idVendedor: _idVendedor});
+                            this.props.navigation.navigate('Menu', {idVendedor: _idVendedor});
                         });
                     }else{
                         this.txtInput._root.clear();

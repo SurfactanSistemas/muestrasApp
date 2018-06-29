@@ -81,6 +81,7 @@ export default class DetallesPreciosVentasProductos extends React.PureComponent{
         );
         const Producto = this.state.itemsFiltrados;
         const {Cliente, DesCliente} = Producto.Datos[0];
+        const WCantidadTotal = Producto.Datos.reduce((total, d) => total + d.Cantidad,0);
         return (
             <Container>
                 <Header style={{backgroundColor: Config.bgColorSecundario}}>
@@ -149,6 +150,15 @@ export default class DetallesPreciosVentasProductos extends React.PureComponent{
                                 </Col>
                             </Row>
                         ))}
+
+                        <Row style={[styles.row, {marginTop: 20, marginBottom: 30}]}>
+                            <Col size={2} style={styles.bloqueAzul} >
+                                <Text style={styles.textoBloqueazul}>Total Kilos</Text>
+                            </Col>
+                            <Col size={4} style={styles.bloqueBlanco}>
+                                <Text style={[styles.textoBloqueBlanco, {fontSize: 20}]}>{parseFloat(WCantidadTotal).toFixed(2)} Kgs</Text>
+                            </Col>
+                        </Row>
                     </Grid>
                 </Content>
             </Container>

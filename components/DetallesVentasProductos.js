@@ -28,7 +28,9 @@ const RenderProducto = ({producto, navigation}) => (
                 <Col size={2} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
                     <View>
                         <Text style={{fontSize: 10, fontStyle: 'italic'}}>
-                            {producto.Datos.length} Venta(s)
+                            {producto.Datos.reduce((total, d) => {
+                               return total + d.Cantidad
+                            },0)} Kilos(s)
                         </Text>
                     </View>
                 </Col>
