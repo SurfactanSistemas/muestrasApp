@@ -2,7 +2,8 @@ const bgColor = '#133c74';
 const bgColorSecundario = '#15427F';
 const bgColorTerciario = '#1a55a7';
 
-const BASE_URL = "http://pruebas-surfac.somee.com/api/";
+// const BASE_URL = "http://pruebas-surfac.somee.com/api/";
+const BASE_URL = "http://fa37996c.ngrok.io/api/";
 const BASE_URL_DEBUG = "http://localhost:49865/api/";
 
 const NormalizarNumero = (num) => {

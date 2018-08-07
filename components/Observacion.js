@@ -41,7 +41,7 @@ export default class Observacion extends React.PureComponent {
 
     handleOnPress(){
         // Validamos que se tenga contenido para ser guardado.
-        if (this.state.Observaciones.trim() == '') return;
+        //if (this.state.Observaciones.trim() == '') return;
 
         // Indicamos que vamos a comenzar con la rutina para el grabado de la Observacion
         // mostrando el spinner al costado del boton de 'Grabar'.
